@@ -112,7 +112,7 @@ export const GameProvider = ({ children }) => {
       setLog(saved.log || []);
       setIsGameOver(saved.isGameOver || false);
       setOracleHints(saved.oracleHints || []);
-      setIsOracleModalOpen(saved.isOracleModalOpen ?? false);
+      setIsOracleModalOpen(true);
     } else {
       // Default initialization from mission metadata
       setCurrentRoomId(mission.startingRoom);
