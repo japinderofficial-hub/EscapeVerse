@@ -928,3 +928,206 @@ h1, h2, h3, h4, .home-title, .oracle-title, .victory-title, .map-title {
   border-radius: 3px;
   font-weight: bold;
 }
+
+/* ========================================================= */
+/* --- RESPONSIVE MOBILE & TABLET MEDIA QUERIES --- */
+/* ========================================================= */
+
+/* Tablet & Laptop Medium Screens (<= 1024px) */
+@media (max-width: 1024px) {
+  .story-panel, .inventory-panel, .oracle-panel {
+    width: 24% !important;
+    min-width: 180px !important;
+    padding: 1rem;
+  }
+
+  .game-header {
+    padding: 0 1rem;
+  }
+
+  .header-title h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Smartphone & Mobile Screens (<= 768px) */
+@media (max-width: 768px) {
+  body {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  #root {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .game-layout {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .game-header {
+    height: auto;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .header-title h1 {
+    font-size: 1.15rem;
+  }
+
+  .header-location {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.2rem;
+    font-size: 0.82rem;
+    padding: 0.3rem 0.75rem;
+  }
+
+  .header-actions {
+    gap: 0.4rem;
+  }
+
+  .header-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  /* Hide button text on small mobile screens to keep top bar compact */
+  .header-btn span {
+    display: none;
+  }
+
+  .game-main-content {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Order Terminal first on mobile screens */
+  .game-center-area {
+    order: 1;
+    width: 100%;
+    height: 420px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .log-panel {
+    padding: 1rem;
+  }
+
+  .command-input-form {
+    padding: 0.75rem 1rem;
+  }
+
+  .command-input {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .send-button {
+    padding: 0 1.1rem;
+    font-size: 0.85rem;
+  }
+
+  .send-button span {
+    display: inline;
+  }
+
+  /* Order Panels below terminal on mobile screens */
+  .story-panel {
+    order: 2;
+    width: 100% !important;
+    min-width: 100% !important;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem;
+    height: auto;
+  }
+
+  .oracle-panel {
+    order: 3;
+    width: 100% !important;
+    min-width: 100% !important;
+    border-left: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem;
+    height: auto;
+  }
+
+  .inventory-panel {
+    order: 4;
+    width: 100% !important;
+    min-width: 100% !important;
+    border-left: none;
+    padding: 1.25rem;
+    height: auto;
+  }
+
+  .inventory-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .inventory-item {
+    margin-bottom: 0;
+  }
+
+  .oracle-btn {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    min-height: 44px;
+  }
+
+  .oracle-modal-card {
+    padding: 1.75rem 1.25rem;
+    max-width: 92vw;
+  }
+
+  .oracle-modal-title {
+    font-size: 1.25rem;
+  }
+
+  .oracle-modal-body {
+    font-size: 0.9rem;
+  }
+
+  .oracle-modal-btn {
+    padding: 0.85rem 1.5rem;
+    min-height: 44px;
+  }
+
+  .victory-modal-card {
+    padding: 1.75rem 1.25rem;
+    max-width: 92vw;
+  }
+
+  .victory-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Extra Small Mobile Devices (<= 480px) */
+@media (max-width: 480px) {
+  .inventory-list {
+    grid-template-columns: 1fr;
+  }
+
+  .victory-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .map-grid-5x5 {
+    max-width: 260px;
+  }
+
+  .map-cell-room {
+    font-size: 0.65rem;
+  }
+}
