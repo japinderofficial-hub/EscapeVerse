@@ -1,0 +1,95 @@
+{
+  "id": "locked_apartment",
+  "title": "The Locked Apartment",
+  "intro": "You wake up with a mild headache. Looking around, you realize you are inside a small, unfamiliar apartment. The main exit door is locked solid. You need to investigate your surroundings, find the key, and escape.",
+  "ending": "*** MISSION COMPLETE! You successfully escaped the apartment! ***",
+  "startingRoom": "living_room",
+  "rooms": {
+    "living_room": {
+      "id": "living_room",
+      "name": "Living Room",
+      "description": "A dusty living room with a worn-out couch, a wooden table, and a locked exit door. A wooden drawer sits in the corner. A doorway to the east leads to the Bedroom.",
+      "exits": {
+        "east": "bedroom"
+      },
+      "objects": ["drawer", "exit_door"],
+      "items": []
+    },
+    "bedroom": {
+      "id": "bedroom",
+      "name": "Bedroom",
+      "description": "A quiet, small bedroom with a single bed and a desk. On the desk, you see a shiny key. A doorway to the west leads back to the Living Room.",
+      "exits": {
+        "west": "living_room"
+      },
+      "objects": ["desk"],
+      "items": ["brass_key"]
+    }
+  },
+  "objects": {
+    "drawer": {
+      "id": "drawer",
+      "name": "Wooden Drawer",
+      "description": "An empty drawer, but written on the bottom is a scribble: 'Look carefully at the bedroom desk!'",
+      "interactable": true,
+      "locked": false,
+      "requiredItem": null
+    },
+    "desk": {
+      "id": "desk",
+      "name": "Desk",
+      "description": "A wooden study desk. It has a smooth surface. There is nothing else of interest here.",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "exit_door": {
+      "id": "exit_door",
+      "name": "Exit Door",
+      "description": "A solid steel-reinforced door. The lock is heavy and requires a brass key to open.",
+      "interactable": true,
+      "locked": true,
+      "requiredItem": "brass_key"
+    }
+  },
+  "items": {
+    "brass_key": {
+      "id": "brass_key",
+      "name": "Brass Key",
+      "description": "A heavy, shiny brass key. It looks like it could unlock the apartment exit.",
+      "takeable": true,
+      "usableOn": ["exit_door"],
+      "combineWith": null
+    }
+  },
+  "puzzles": {
+    "exit_puzzle": {
+      "id": "exit_puzzle",
+      "requiredItem": "brass_key",
+      "targetObject": "exit_door",
+      "successResponse": "You insert the Brass Key into the lock. With a satisfying click, the exit door swings open! You are free!",
+      "failureResponse": "The key doesn't fit or something is missing."
+    }
+  },
+  "objectives": [
+    {
+      "id": "find_key",
+      "text": "Find the key in the bedroom",
+      "type": "inventory",
+      "target": "brass_key"
+    },
+    {
+      "id": "escape",
+      "text": "Unlock the exit door and escape the apartment",
+      "type": "puzzle",
+      "target": "exit_puzzle"
+    }
+  ],
+  "npcs": {},
+  "mapLayout": [
+    ["living_room", "h-line", "bedroom"]
+  ],
+  "oracleConfig": {
+    "truthProbability": 0.50
+  }
+}

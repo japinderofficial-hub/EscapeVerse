@@ -1,0 +1,310 @@
+{
+  "id": "haunted_mansion",
+  "title": "The Haunted Mansion",
+  "intro": "You stand in the cold, dim foyer of a creepy old mansion. The heavy oak front door is slammed shut, locked by a magical glowing seal. Cold wind whispers through the corridor. You must investigate the rooms, search for clues, find the ghost bane potion, and break the seal to escape.",
+  "ending": "*** MISSION COMPLETE! The magical seal shatters. You swing the oak door open and run free into the sunlight! ***",
+  "startingRoom": "foyer",
+  "rooms": {
+    "foyer": {
+      "id": "foyer",
+      "name": "Foyer",
+      "description": "The grand entrance hall. A massive oak front door is blocked by a magical glowing seal. A grand grandfather clock stands in the corner. There is a locked iron door leading down, and corridors lead to the north, east, and west.",
+      "exits": {
+        "north": "bedroom",
+        "east": "study",
+        "west": "kitchen",
+        "south": {
+          "roomId": "basement",
+          "requiredPuzzle": "basement_door_puzzle",
+          "lockMessage": "The iron door leading to the basement is locked tight. It requires a brass key of some sort..."
+        }
+      },
+      "objects": ["magical_seal", "grandfather_clock", "basement_door"],
+      "items": []
+    },
+    "bedroom": {
+      "id": "bedroom",
+      "name": "Bedroom",
+      "description": "A decaying, dusty bedroom containing a double bed with a torn mattress, a small bedside table, and a large ornate mirror on the wall. A hallway leads south back to the Foyer.",
+      "exits": {
+        "south": "foyer"
+      },
+      "objects": ["double_bed", "bedside_table", "ornate_mirror"],
+      "items": ["old_key", "ancient_coin"]
+    },
+    "kitchen": {
+      "id": "kitchen",
+      "name": "Kitchen",
+      "description": "A damp, dark kitchen smelling of mold and ash. Old wooden cabinets hang open, a broken radio sits on the counter, and a cold soot-filled fireplace is in the corner. A hallway leads east back to the Foyer.",
+      "exits": {
+        "east": "foyer"
+      },
+      "objects": ["wooden_cabinets", "broken_radio", "ashy_fireplace"],
+      "items": ["rusty_crowbar"]
+    },
+    "study": {
+      "id": "study",
+      "name": "Study",
+      "description": "A quiet study room lined with dusty bookshelves. A large mahogany desk sits under the window, and a metal wall safe is embedded in the paneling. A hallway leads west back to the Foyer.",
+      "exits": {
+        "west": "foyer"
+      },
+      "objects": ["study_bookshelf", "mahogany_desk", "wall_safe"],
+      "items": ["code_notebook", "battery"]
+    },
+    "basement": {
+      "id": "basement",
+      "name": "Basement",
+      "description": "A freezing, stone basement lit only by flickering candles. In the center sits a heavy iron chest bound in thick chains. A set of stairs leads north back to the Foyer.",
+      "exits": {
+        "north": "foyer"
+      },
+      "objects": ["iron_chest", "flickering_candles"],
+      "items": []
+    }
+  },
+  "objects": {
+    "magical_seal": {
+      "id": "magical_seal",
+      "name": "Magical Seal",
+      "description": "A glowing blue seal of energy blocking the oak front door. It requires a Ghost Bane Potion to dissolve.",
+      "interactable": true,
+      "locked": true,
+      "requiredItem": "ghost_potion"
+    },
+    "grandfather_clock": {
+      "id": "grandfather_clock",
+      "name": "Grandfather Clock",
+      "description": "A tall pendulum clock that has stopped at exactly 3:15. A faint inscription reads: 'The hour of the dead holds the key.'",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "basement_door": {
+      "id": "basement_door",
+      "name": "Locked Iron Door",
+      "description": "A heavy iron door leading to the basement. It is secured by a brass padlock. It requires an Old Key.",
+      "interactable": true,
+      "locked": true,
+      "requiredItem": "old_key"
+    },
+    "double_bed": {
+      "id": "double_bed",
+      "name": "Double Bed",
+      "description": "You search under the mattress and discover a keyhole... wait, no, you actually find an Old Key tucked inside a hole in the springs!",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "bedside_table": {
+      "id": "bedside_table",
+      "name": "Bedside Table",
+      "description": "A small nightstand drawer. Inside, you find an Ancient Coin covered in grime. (Decoy Clue: Doesn't fit any locks!)",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "ornate_mirror": {
+      "id": "ornate_mirror",
+      "name": "Ornate Mirror",
+      "description": "A large silver mirror. The glass is fogged up. In the dust, someone has written the numbers: '3 1 5'.",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "wooden_cabinets": {
+      "id": "wooden_cabinets",
+      "name": "Wooden Cabinets",
+      "description": "Old cabinets containing broken plates. Sticking out of a bottom drawer is a Rusty Crowbar!",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "broken_radio": {
+      "id": "broken_radio",
+      "name": "Broken Radio",
+      "description": "A copper-wire vintage radio. (Decoy Clue: Inserting a battery makes it play static music, but nothing else happens!)",
+      "interactable": true,
+      "locked": false,
+      "requiredItem": "battery"
+    },
+    "ashy_fireplace": {
+      "id": "ashy_fireplace",
+      "name": "Ashy Fireplace",
+      "description": "Just black soot and cold wood ashes. Nothing useful here.",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "study_bookshelf": {
+      "id": "study_bookshelf",
+      "name": "Study Bookshelf",
+      "description": "Rows of leather-bound grimoires. Tucked behind a volume on alchemy, you find a small AA battery. (Decoy Clue!)",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "mahogany_desk": {
+      "id": "mahogany_desk",
+      "name": "Mahogany Desk",
+      "description": "A locked desk drawer. Opening the central drawer reveals a leather-bound Notebook with blank pages except for a drawing of a wall safe.",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    },
+    "wall_safe": {
+      "id": "wall_safe",
+      "name": "Wall Safe",
+      "description": "A metal wall safe with a three-digit combination lock dial. The safe requires the Notebook to translate the dial. Dial the correct combination code by typing 'use [item] on safe' to solve it.",
+      "interactable": true,
+      "locked": true,
+      "requiredItem": "code_notebook"
+    },
+    "iron_chest": {
+      "id": "iron_chest",
+      "name": "Iron Chest",
+      "description": "A heavy iron chest wrapped in thick iron chains. It is locked solid. You need something heavy and strong to break the chains.",
+      "interactable": true,
+      "locked": true,
+      "requiredItem": "rusty_crowbar"
+    },
+    "flickering_candles": {
+      "id": "flickering_candles",
+      "name": "Flickering Candles",
+      "description": "Tallow candles melting onto the stone floor, providing dim illumination.",
+      "interactable": false,
+      "locked": false,
+      "requiredItem": null
+    }
+  },
+  "items": {
+    "old_key": {
+      "id": "old_key",
+      "name": "Old Key",
+      "description": "A heavy iron key found in the bedroom. It looks like it unlocks the padlock on the basement door.",
+      "takeable": true,
+      "usableOn": ["basement_door"],
+      "combineWith": null
+    },
+    "ancient_coin": {
+      "id": "ancient_coin",
+      "name": "Ancient Coin",
+      "description": "A strange coin with a skull design. It doesn't seem to fit any locks. Probably a distraction.",
+      "takeable": true,
+      "usableOn": [],
+      "combineWith": null
+    },
+    "rusty_crowbar": {
+      "id": "rusty_crowbar",
+      "name": "Rusty Crowbar",
+      "description": "A heavy, solid iron crowbar. Ideal for prying open cabinets or snapping chains.",
+      "takeable": true,
+      "usableOn": ["iron_chest"],
+      "combineWith": null
+    },
+    "code_notebook": {
+      "id": "code_notebook",
+      "name": "Notebook",
+      "description": "A leather-bound journal containing safe mechanism drawings. You can use this to try opening the wall safe.",
+      "takeable": true,
+      "usableOn": ["wall_safe"],
+      "combineWith": null
+    },
+    "battery": {
+      "id": "battery",
+      "name": "Battery",
+      "description": "A standard AA cell. Might power a portable appliance, like a radio. (Decoy!)",
+      "takeable": true,
+      "usableOn": ["broken_radio"],
+      "combineWith": null
+    },
+    "ghost_potion": {
+      "id": "ghost_potion",
+      "name": "Ghost Bane Potion",
+      "description": "A swirling, magical blue potion that glows intensely. Useful for dissolving spiritual barriers.",
+      "takeable": true,
+      "usableOn": ["magical_seal"],
+      "combineWith": null
+    }
+  },
+  "puzzles": {
+    "basement_door_puzzle": {
+      "id": "basement_door_puzzle",
+      "requiredItem": "old_key",
+      "targetObject": "basement_door",
+      "successResponse": "You insert the Old Key into the padlocked iron door. With a satisfying heavy click, the padlock snaps open. The basement door is now unlocked!",
+      "failureResponse": "The door remains locked. It requires a brass Old Key."
+    },
+    "safe_puzzle": {
+      "id": "safe_puzzle",
+      "requiredItem": "code_notebook",
+      "targetObject": "wall_safe",
+      "successResponse": "Using the clues found on the grandfather clock and the mirror ('315'), you check the safe diagram inside the Notebook and rotate the dial to 3 - 1 - 5. Click! The safe swings open, but there is no key inside. Instead, a message is carved into the metal: 'The final cure lies in the iron chest under the house. You will need a crowbar to snap the chains!'",
+      "failureResponse": "You turn the safe dial, but it doesn't open. You need some notes or reference code."
+    },
+    "chest_puzzle": {
+      "id": "chest_puzzle",
+      "requiredItem": "rusty_crowbar",
+      "targetObject": "iron_chest",
+      "successResponse": "You wedge the Rusty Crowbar deep into the loops of the chains binding the chest and leverage it with all your weight. Snap! The chain links break and fall away. The heavy lid swings open, revealing a glowing Ghost Bane Potion on a velvet cushion! The potion is now lying on the floor, ready to be taken.",
+      "failureResponse": "The chains are too thick to break by hand. You need a solid metal levering tool.",
+      "rewardItem": "ghost_potion"
+    },
+    "seal_puzzle": {
+      "id": "seal_puzzle",
+      "requiredItem": "ghost_potion",
+      "targetObject": "magical_seal",
+      "successResponse": "You pour the glowing blue Ghost Bane Potion onto the magical seal blocking the entrance. The seal sizzles and boils, dissolving into thin air! The heavy oak front door swings wide open!",
+      "failureResponse": "The seal glows bright red, rejecting the contact. It requires a powerful magical potion."
+    }
+  },
+  "objectives": [
+    {
+      "id": "search_kitchen",
+      "text": "Search the Kitchen",
+      "type": "visit",
+      "target": "kitchen"
+    },
+    {
+      "id": "find_notebook",
+      "text": "Find the Notebook in the Study",
+      "type": "inventory",
+      "target": "code_notebook"
+    },
+    {
+      "id": "unlock_safe",
+      "text": "Decipher the Study safe code",
+      "type": "puzzle",
+      "target": "safe_puzzle"
+    },
+    {
+      "id": "unlock_chest",
+      "text": "Break the basement chest chains",
+      "type": "puzzle",
+      "target": "chest_puzzle"
+    },
+    {
+      "id": "obtain_potion",
+      "text": "Obtain the Ghost Bane Potion",
+      "type": "inventory",
+      "target": "ghost_potion"
+    },
+    {
+      "id": "break_seal",
+      "text": "Break the magical seal in the Foyer",
+      "type": "puzzle",
+      "target": "seal_puzzle"
+    }
+  ],
+  "npcs": {},
+  "mapLayout": [
+    [null, null, "bedroom", null, null],
+    [null, null, "v-line", null, null],
+    ["kitchen", "h-line", "foyer", "h-line", "study"],
+    [null, null, "v-line", null, null],
+    [null, null, "basement", null, null]
+  ],
+  "oracleConfig": {
+    "truthProbability": 0.30
+  }
+}
