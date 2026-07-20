@@ -36,3 +36,41 @@ export const clearGameState = () => {
     console.error("Failed to clear game state in localStorage:", error);
   }
 };
+
+const API_KEY_STORAGE_KEY = "escapeverse_gemini_api_key";
+
+/**
+ * Saves the Gemini API key to Local Storage.
+ * @param {string} key - The API key.
+ */
+export const saveApiKey = (key) => {
+  try {
+    localStorage.setItem(API_KEY_STORAGE_KEY, key);
+  } catch (error) {
+    console.error("Failed to save API key to localStorage:", error);
+  }
+};
+
+/**
+ * Loads the Gemini API key from Local Storage.
+ * @returns {string|null} The API key, or null if not found.
+ */
+export const loadApiKey = () => {
+  try {
+    return localStorage.getItem(API_KEY_STORAGE_KEY);
+  } catch (error) {
+    console.error("Failed to load API key from localStorage:", error);
+    return null;
+  }
+};
+
+/**
+ * Clears the Gemini API key from Local Storage.
+ */
+export const clearApiKey = () => {
+  try {
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+  } catch (error) {
+    console.error("Failed to clear API key in localStorage:", error);
+  }
+};

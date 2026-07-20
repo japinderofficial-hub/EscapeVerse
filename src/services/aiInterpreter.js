@@ -1,4 +1,5 @@
 import { parseIntent } from "../utils/intentParser";
+import { loadApiKey } from "../utils/storage";
 
 /**
  * Interprets player command input using the Gemini API.
@@ -16,7 +17,8 @@ import { parseIntent } from "../utils/intentParser";
  * @returns {Promise<Object>} Structured intent object { intent, item, target }
  */
 export const interpretPlayerCommand = async (input, gameContext) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  // 1. Prioritize dynamic user key, fallback to env key
+  const apiKey = loadApiKey() || import.meta.env.VITE_GEMINI_API_KEY;
 
   // Fallback 1: No API key configured
   if (!apiKey) {
@@ -62,7 +64,7 @@ JSON:`;
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {

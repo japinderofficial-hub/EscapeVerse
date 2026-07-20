@@ -1,3 +1,5 @@
+import { loadApiKey } from "../utils/storage";
+
 /**
  * Local fallback data of hints for both missions to guarantee the game never crashes.
  */
@@ -50,7 +52,7 @@ const fallbackHints = {
  * @returns {Promise<Object>} { isTruth: boolean, text: string }
  */
 export const getOracleHint = async (context) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = loadApiKey() || import.meta.env.VITE_GEMINI_API_KEY;
 
   // 1. Determine if the Oracle will tell the truth or mislead
   const isTruth = Math.random() < context.truthProbability;
@@ -97,7 +99,7 @@ Oracle Hint:`;
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {

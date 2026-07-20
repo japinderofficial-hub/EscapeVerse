@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
+import DetectiveGame from "./pages/DetectiveGame";
 import "./styles/game.css"; // Clean application styles
 
 const App = () => {
@@ -13,6 +14,9 @@ const App = () => {
         
         {/* Route for the Core Escape Room Game Screen */}
         <Route path="/game" element={<Game />} />
+
+        {/* Route for the Interactive Detective Game Screen */}
+        <Route path="/detective" element={<DetectiveGame />} />
       </Routes>
     </Router>
   );

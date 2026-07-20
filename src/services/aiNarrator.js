@@ -1,3 +1,5 @@
+import { loadApiKey } from "../utils/storage";
+
 /**
  * Generates an atmospheric, cinematic narration wrapper around a game engine result message.
  * Automatically falls back to the original engine result text if:
@@ -16,7 +18,7 @@
  * @returns {Promise<string>} Immersive narration string.
  */
 export const generateNarration = async (context) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = loadApiKey() || import.meta.env.VITE_GEMINI_API_KEY;
 
   // Fallback 1: No API key configured
   if (!apiKey) {
@@ -50,7 +52,7 @@ Narrative description:`;
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
