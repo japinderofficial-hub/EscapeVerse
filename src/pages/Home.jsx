@@ -11,10 +11,10 @@ const Home = () => {
   return (
     <div className="home-container">
       <div className="home-card">
-        <h1 className="home-title">EscapeVerse AI</h1>
+        <h1 className="home-title">EscapeVerse</h1>
         <p className="home-description">
-          Welcome to EscapeVerse AI, an offline AI-ready escape room game. 
-          Investigate rooms, discover secrets, solve puzzles, and find your way out.
+          Welcome to EscapeVerse, an offline AI-ready escape room game. 
+          Step inside, solve puzzles, and escape before time runs out.
         </p>
         <button className="start-button" onClick={handleStartGame}>
           START GAME

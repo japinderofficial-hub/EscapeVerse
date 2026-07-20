@@ -1,6 +1,6 @@
-# React + Vite
+# EscapeVerse
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+An offline AI-ready escape room text adventure game built with React, Vite, and Web Audio API.
 
 Currently, two official plugins are available:
 

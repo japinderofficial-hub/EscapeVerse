@@ -4,7 +4,7 @@
 const sanitize = (text) => (text ? text.toLowerCase().trim() : "");
 
 /**
- * Intent Parser for EscapeVerse AI.
+ * Intent Parser for EscapeVerse.
  * Translates raw user phrases into structured command intents.
  * 
  * @param {string} rawInput - The raw string entered by the player.
