@@ -7,6 +7,13 @@ import {
 } from "../services/detectiveAiService";
 import Atmosphere from "../components/Atmosphere";
 import { DETECTIVE_SCRIPT, DETECTIVE_INTRO } from "../utils/detectiveScript";
+import {
+  registerOrResumePlayer,
+  updatePlayerSession,
+  markPlayerInactive,
+  getPlayerSession,
+} from "../services/leaderboardService";
+import { loadApiKey, saveApiKey } from "../utils/storage";
 
 // ── Rank config ────────────────────────────────────────────────────────────────
 const RANKS = [
@@ -19,9 +26,58 @@ const RANKS = [
 const getRank = (progress) =>
   [...RANKS].reverse().find((r) => progress >= r.min) || RANKS[0];
 
+// ── API Key Renewal Modal ──────────────────────────────────────────────────────
+const ApiKeyRenewalModal = ({ onSave }) => {
+  const [keyInput, setKeyInput] = useState("");
+  return (
+    <div className="oracle-modal-overlay">
+      <div className="oracle-modal-card" style={{ maxWidth: "460px" }}>
+        <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔑</div>
+        <h2 className="oracle-modal-title">API Limit Reached</h2>
+        <p className="oracle-modal-body">
+          Your Groq API key has hit its rate limit or is invalid.<br />
+          Generate a new key at <strong style={{ color: "var(--color-accent)" }}>console.groq.com</strong> → API Keys, then paste it below to continue.
+        </p>
+        <input
+          type="password"
+          value={keyInput}
+          onChange={(e) => setKeyInput(e.target.value)}
+          placeholder="gsk_..."
+          autoFocus
+          style={{
+            width: "100%", padding: "12px 16px", marginBottom: "14px",
+            background: "rgba(0,0,0,0.6)", border: "1px solid rgba(0,255,204,0.4)",
+            color: "#00ffcc", fontFamily: "var(--font-mono)", fontSize: "0.95rem",
+            borderRadius: "4px", outline: "none", boxSizing: "border-box",
+          }}
+        />
+        <button
+          className="oracle-modal-btn"
+          disabled={!keyInput.trim().startsWith("gsk_")}
+          style={{ opacity: keyInput.trim().startsWith("gsk_") ? 1 : 0.4 }}
+          onClick={() => { saveApiKey(keyInput.trim()); onSave(keyInput.trim()); }}
+        >
+          Save Key &amp; Continue
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // ── Name Entry Screen ──────────────────────────────────────────────────────────
 const NameEntry = ({ onStart }) => {
   const [nameInput, setNameInput] = useState("");
+  const [savedSession, setSavedSession] = useState(null);
+
+  const handleNameChange = (val) => {
+    setNameInput(val);
+    if (val.trim().length >= 2) {
+      const session = getPlayerSession(val.trim());
+      setSavedSession(session);
+    } else {
+      setSavedSession(null);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,7 +96,7 @@ const NameEntry = ({ onStart }) => {
           Case File #001 — The Crimson Ledger
         </p>
       </div>
-      <div style={{ background: "rgba(255,204,0,0.04)", border: "1px solid rgba(255,204,0,0.2)", borderRadius: "8px", padding: "24px 32px", maxWidth: "420px", width: "100%", textAlign: "center" }}>
+      <div style={{ background: "rgba(255,204,0,0.04)", border: "1px solid rgba(255,204,0,0.2)", borderRadius: "8px", padding: "24px 32px", maxWidth: "440px", width: "100%", textAlign: "center" }}>
         <p style={{ color: "#ccc", fontFamily: "var(--font-mono)", fontSize: "0.85rem", marginBottom: "20px", lineHeight: "1.7" }}>
           A priceless diamond has vanished.<br />
           A guard lies murdered.<br />
@@ -51,18 +107,39 @@ const NameEntry = ({ onStart }) => {
           <input
             type="text"
             value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
+            onChange={(e) => handleNameChange(e.target.value)}
             placeholder="Enter your name..."
             autoFocus
             style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,204,0,0.4)", color: "var(--color-accent)", padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "1rem", borderRadius: "4px", outline: "none", textAlign: "center", letterSpacing: "2px", width: "100%", boxSizing: "border-box" }}
             maxLength={30}
           />
+
+          {/* Returning player banner */}
+          {savedSession && (
+            <div style={{ background: "rgba(0,255,204,0.06)", border: "1px solid rgba(0,255,204,0.25)", borderRadius: "6px", padding: "10px 14px", textAlign: "left" }}>
+              <div style={{ color: "#00ffcc", fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "1px", marginBottom: "4px" }}>
+                ↩ RESUMING SESSION
+              </div>
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                <span style={{ color: "#aaa", fontFamily: "var(--font-mono)", fontSize: "11px" }}>
+                  Score: <strong style={{ color: "#fff" }}>{(savedSession.score ?? 0).toLocaleString()} pts</strong>
+                </span>
+                <span style={{ color: "#aaa", fontFamily: "var(--font-mono)", fontSize: "11px" }}>
+                  Progress: <strong style={{ color: "#fff" }}>{savedSession.caseProgress ?? 0}%</strong>
+                </span>
+                <span style={{ color: "#aaa", fontFamily: "var(--font-mono)", fontSize: "11px" }}>
+                  Rank: <strong style={{ color: "#fff" }}>{savedSession.rank ?? "Rookie"}</strong>
+                </span>
+              </div>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={!nameInput.trim()}
             style={{ background: nameInput.trim() ? "var(--color-accent)" : "#333", color: nameInput.trim() ? "#111" : "#555", border: "none", padding: "12px", fontFamily: "var(--font-mono)", fontSize: "0.95rem", fontWeight: "bold", letterSpacing: "2px", borderRadius: "4px", cursor: nameInput.trim() ? "pointer" : "not-allowed", transition: "all 0.25s ease" }}
           >
-            BEGIN INVESTIGATION
+            {savedSession ? "RESUME INVESTIGATION" : "BEGIN INVESTIGATION"}
           </button>
         </form>
       </div>
@@ -234,24 +311,104 @@ const DetectiveGame = () => {
   const [hintsUsed, setHintsUsed] = useState(0);
   const [isLoadingHint, setIsLoadingHint] = useState(false);
 
-  const handleStart = (name) => {
-    setDetectiveName(name);
-    setLog([{ type: "system", text: DETECTIVE_INTRO.replace("You are Detective Ethan Carter", `You are Detective ${name}`) }]);
+  // API key renewal
+  const [showApiRenewal, setShowApiRenewal] = useState(false);
+
+  // ── Refs to always have current values in async callbacks ──────────────────
+  const scoreRef = useRef(0);
+  const caseProgressRef = useRef(0);
+  const hintsUsedRef = useRef(0);
+  const hintsRef = useRef([]);
+  const logRef = useRef([]);
+  const targetCharacterRef = useRef("");
+
+  const syncRef = (setter, ref) => (val) => {
+    setter(val);
+    if (typeof val === "function") {
+      ref.current = val(ref.current);
+    } else {
+      ref.current = val;
+    }
   };
+
+  const setScoreSync        = syncRef(setScore,          scoreRef);
+  const setCaseProgressSync = syncRef(setCaseProgress,   caseProgressRef);
+  const setHintsUsedSync    = syncRef(setHintsUsed,      hintsUsedRef);
+  const setHintsSync        = syncRef(setHints,          hintsRef);
+  const setLogSync          = syncRef(setLog,            logRef);
+  const setTargetCharSync   = syncRef(setTargetCharacter, targetCharacterRef);
+
+  // ── Persist to leaderboard whenever score/progress changes ─────────────────
+  const persistSession = (name, overrides = {}) => {
+    updatePlayerSession(name, {
+      score:           overrides.score           ?? scoreRef.current,
+      caseProgress:    overrides.caseProgress    ?? caseProgressRef.current,
+      hintsUsed:       overrides.hintsUsed       ?? hintsUsedRef.current,
+      rank:            getRank(overrides.caseProgress ?? caseProgressRef.current).label,
+      log:             overrides.log             ?? logRef.current,
+      targetCharacter: overrides.targetCharacter ?? targetCharacterRef.current,
+      hints:           overrides.hints           ?? hintsRef.current,
+      apiKey:          loadApiKey(),
+    });
+  };
+
+  // ── Start / Resume session ──────────────────────────────────────────────────
+  const handleStart = (name) => {
+    const session = registerOrResumePlayer(name, loadApiKey());
+
+    if (session.log && session.log.length > 0) {
+      // Resuming — restore everything
+      setLogSync(session.log);
+      setScoreSync(session.score ?? 0);
+      setCaseProgressSync(session.caseProgress ?? 0);
+      setHintsUsedSync(session.hintsUsed ?? 0);
+      setHintsSync(session.hints ?? []);
+      setTargetCharSync(session.targetCharacter ?? "");
+      setDetectiveName(name);
+
+      // Inject resume notice at the end of the log
+      const resumeMsg = { type: "system", text: `↩ Session resumed. Score: ${(session.score ?? 0).toLocaleString()} pts · Progress: ${session.caseProgress ?? 0}%` };
+      setLogSync((prev) => [...prev, resumeMsg]);
+    } else {
+      // New session
+      const introLog = [{ type: "system", text: DETECTIVE_INTRO.replace("You are Detective Ethan Carter", `You are Detective ${name}`) }];
+      setLogSync(introLog);
+      setScoreSync(0);
+      setCaseProgressSync(0);
+      setHintsUsedSync(0);
+      setHintsSync([]);
+      setTargetCharSync("");
+      setDetectiveName(name);
+    }
+  };
+
+  // ── Cleanup on unmount / navigation ────────────────────────────────────────
+  useEffect(() => {
+    return () => {
+      if (detectiveName) markPlayerInactive(detectiveName);
+    };
+  }, [detectiveName]);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [log]);
 
   const handleHint = async () => {
-    if (hintsUsed >= 5 || isLoadingHint) return;
+    if (hintsUsedRef.current >= 5 || isLoadingHint) return;
     setIsLoadingHint(true);
     try {
-      const hint = await generateHint(log, hintsUsed, DETECTIVE_SCRIPT);
-      setHints((prev) => [hint, ...prev]);
-      setHintsUsed((prev) => prev + 1);
+      const hint = await generateHint(logRef.current, hintsUsedRef.current, DETECTIVE_SCRIPT);
+      const newHints = (prev) => [hint, ...prev];
+      setHintsSync(newHints);
+      setHintsUsedSync((prev) => prev + 1);
+      persistSession(detectiveName);
     } catch (err) {
-      setHints((prev) => ["Informant couldn't be reached. Try again.", ...prev]);
+      const isApiLimit = err.message?.includes("429") || err.message?.toLowerCase().includes("rate limit");
+      if (isApiLimit) {
+        setShowApiRenewal(true);
+      } else {
+        setHintsSync((prev) => ["Informant couldn't be reached. Try again.", ...prev]);
+      }
     } finally {
       setIsLoadingHint(false);
     }
@@ -263,63 +420,81 @@ const DetectiveGame = () => {
 
     const playerInput = input.trim();
     setInput("");
-    setLog((prev) => [...prev, { type: "player", text: `> ${playerInput}` }]);
+    setLogSync((prev) => [...prev, { type: "player", text: `> ${playerInput}` }]);
 
     // Switch character
     const talkMatch = playerInput.toLowerCase().match(/^talk to (.+)/);
     if (talkMatch) {
       const newChar = talkMatch[1].trim();
-      // Capitalise properly
       const formatted = newChar.replace(/\b\w/g, (c) => c.toUpperCase());
-      setTargetCharacter(formatted);
-      setLog((prev) => [...prev, { type: "system", text: `You approach ${formatted}. They look up as you begin your questioning.` }]);
+      setTargetCharSync(formatted);
+      setLogSync((prev) => [...prev, { type: "system", text: `You approach ${formatted}. They look up as you begin your questioning.` }]);
+      persistSession(detectiveName);
       return;
     }
 
-    if (!targetCharacter) {
-      setLog((prev) => [...prev, { type: "system", text: `Type 'talk to [Suspect Name]' to start interrogating someone.\nExample: talk to Rohan Mehta` }]);
+    if (!targetCharacterRef.current) {
+      setLogSync((prev) => [...prev, { type: "system", text: `Type 'talk to [Suspect Name]' to start interrogating someone.\nExample: talk to Rohan Mehta` }]);
       return;
     }
 
     setIsProcessing(true);
-    setLog((prev) => [...prev, { type: "system", text: `${targetCharacter} takes a breath before responding...` }]);
+    const currentTarget = targetCharacterRef.current;
+    setLogSync((prev) => [...prev, { type: "system", text: `${currentTarget} takes a breath before responding...` }]);
 
     const personalisedScript = DETECTIVE_SCRIPT.replace("You are Detective Ethan Carter", `You are Detective ${detectiveName}`);
 
     try {
-      const response = await generateCharacterResponse(targetCharacter, playerInput, personalisedScript, detectiveName);
+      const response = await generateCharacterResponse(currentTarget, playerInput, personalisedScript, detectiveName);
 
-      const updatedLog = (prev) => {
+      setLogSync((prev) => {
         const newLog = [...prev];
         newLog.pop();
-        newLog.push({ type: "character", character: targetCharacter, text: response });
+        newLog.push({ type: "character", character: currentTarget, text: response });
         return newLog;
-      };
-      setLog(updatedLog);
+      });
 
-      // Async scoring (fire and forget — don't block UI)
-      evaluateQuestion(playerInput, response, [...log, { type: "player", text: playerInput }, { type: "character", character: targetCharacter, text: response }])
+      // Async scoring — fire and forget, but persist on completion
+      evaluateQuestion(playerInput, response, [...logRef.current, { type: "player", text: playerInput }, { type: "character", character: currentTarget, text: response }])
         .then((eval_) => {
-          if (eval_.question_score) setScore((prev) => prev + eval_.question_score);
-          if (eval_.case_progress !== null) setCaseProgress(eval_.case_progress);
+          if (eval_.question_score) setScoreSync((prev) => prev + eval_.question_score);
+          if (eval_.case_progress !== null) setCaseProgressSync(eval_.case_progress);
+          persistSession(detectiveName);
         })
         .catch(() => {});
 
     } catch (error) {
-      setLog((prev) => {
+      const isApiLimit = error.message?.includes("429") || error.message?.toLowerCase().includes("rate limit") || error.message?.includes("401");
+      setLogSync((prev) => {
         const newLog = [...prev];
         newLog.pop();
-        newLog.push({ type: "system", text: `Error connecting to API: ${error.message}` });
+        if (isApiLimit) {
+          newLog.push({ type: "system", text: `⚠ API limit reached or key invalid. Generate a new key to continue.` });
+        } else {
+          newLog.push({ type: "system", text: `Error connecting to API: ${error.message}` });
+        }
         return newLog;
       });
+      if (isApiLimit) setShowApiRenewal(true);
     } finally {
       setIsProcessing(false);
+      persistSession(detectiveName);
     }
   };
 
   return (
     <div className="game-layout">
       <Atmosphere />
+
+      {/* API Key Renewal Modal */}
+      {showApiRenewal && (
+        <ApiKeyRenewalModal
+          onSave={(newKey) => {
+            updatePlayerSession(detectiveName, { apiKey: newKey });
+            setShowApiRenewal(false);
+          }}
+        />
+      )}
 
       <header className="game-header" style={{ justifyContent: "space-between" }}>
         <div className="header-title">
@@ -331,6 +506,9 @@ const DetectiveGame = () => {
               Score: {score.toLocaleString()} pts
             </span>
           )}
+          <button className="header-btn" onClick={() => navigate("/leaderboard")} title="Leaderboard">
+            <span>🏆 Board</span>
+          </button>
           <button className="header-btn" onClick={() => navigate("/")} title="Return to Menu">
             <span>Main Menu</span>
           </button>
@@ -415,8 +593,7 @@ const DetectiveGame = () => {
             isLoadingHint={isLoadingHint}
             isProcessing={isProcessing}
           />
-        )}
-      </div>
+        )}      </div>
     </div>
   );
 };

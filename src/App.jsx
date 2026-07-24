@@ -3,20 +3,28 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
 import DetectiveGame from "./pages/DetectiveGame";
-import "./styles/game.css"; // Clean application styles
+import Leaderboard from "./pages/Leaderboard";
+import AdminPortal from "./pages/AdminPortal";
+import "./styles/game.css";
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Route for the Home/Landing Page */}
+        {/* Landing Page */}
         <Route path="/" element={<Home />} />
-        
-        {/* Route for the Core Escape Room Game Screen */}
+
+        {/* Escape Room Game */}
         <Route path="/game" element={<Game />} />
 
-        {/* Route for the Interactive Detective Game Screen */}
+        {/* Detective Interrogation Game */}
         <Route path="/detective" element={<DetectiveGame />} />
+
+        {/* Public Leaderboard */}
+        <Route path="/leaderboard" element={<Leaderboard />} />
+
+        {/* Admin Portal (password-protected) */}
+        <Route path="/admin" element={<AdminPortal />} />
       </Routes>
     </Router>
   );

@@ -1131,3 +1131,327 @@ h1, h2, h3, h4, .home-title, .oracle-title, .victory-title, .map-title {
     font-size: 0.65rem;
   }
 }
+
+/* ========================================================= */
+/* --- LEADERBOARD PAGE --- */
+/* ========================================================= */
+
+.lb-page {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  padding: 32px 16px 48px;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+}
+
+.lb-container {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.lb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.lb-title {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  color: var(--color-accent);
+  letter-spacing: 2px;
+  margin: 0 0 4px;
+}
+
+.lb-subtitle {
+  color: #555;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.lb-back-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.lb-back-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.lb-refresh-tag {
+  color: #444;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* Stats bar */
+.lb-stats-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.lb-stat-pill {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 110px;
+}
+
+.lb-stat-label {
+  color: #555;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.lb-stat-value {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Table */
+.lb-table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.lb-table thead tr {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.lb-table thead th {
+  padding: 12px 14px;
+  text-align: left;
+  color: #555;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+.lb-table tbody tr {
+  background: var(--bg-primary);
+  border-bottom: 1px solid rgba(229,195,126,0.06);
+  transition: background 0.15s ease;
+}
+
+.lb-table tbody tr:hover {
+  background: var(--bg-secondary);
+}
+
+.lb-row-top {
+  background: rgba(229,195,126,0.03) !important;
+}
+
+.lb-table td {
+  padding: 12px 14px;
+  vertical-align: middle;
+}
+
+.lb-medal {
+  font-size: 16px;
+  width: 40px;
+  text-align: center;
+}
+
+.lb-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+.lb-active-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00ffcc;
+  box-shadow: 0 0 6px rgba(0,255,204,0.8);
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.lb-score {
+  color: var(--color-accent);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.lb-progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 130px;
+}
+
+.lb-progress-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.lb-progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.lb-status-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.lb-status-badge.active {
+  color: #00ffcc;
+  background: rgba(0,255,204,0.08);
+  border: 1px solid rgba(0,255,204,0.25);
+}
+
+.lb-status-badge.offline {
+  color: #444;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid #222;
+}
+
+.lb-lastseen {
+  color: #555;
+  font-size: 11px;
+}
+
+/* Empty state */
+.lb-empty {
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+/* Play button */
+.lb-play-btn {
+  background: var(--color-accent);
+  color: var(--bg-primary);
+  border: none;
+  padding: 12px 32px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.lb-play-btn:hover {
+  background: var(--color-accent-hover);
+  box-shadow: 0 0 14px rgba(229,195,126,0.35);
+}
+
+/* ========================================================= */
+/* --- ADMIN PORTAL ACTION BUTTONS --- */
+/* ========================================================= */
+
+.admin-action-btn {
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-action-btn.reset {
+  color: #6ac1ff;
+  border-color: rgba(106,193,255,0.3);
+  background: rgba(106,193,255,0.05);
+}
+
+.admin-action-btn.reset:hover {
+  background: rgba(106,193,255,0.15);
+}
+
+.admin-action-btn.delete {
+  color: #ef4444;
+  border-color: rgba(239,68,68,0.3);
+  background: rgba(239,68,68,0.05);
+}
+
+.admin-action-btn.delete:hover {
+  background: rgba(239,68,68,0.15);
+}
+
+/* ========================================================= */
+/* --- RESPONSIVE LEADERBOARD --- */
+/* ========================================================= */
+
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .lb-page {
+    padding: 20px 12px 40px;
+  }
+
+  .lb-title {
+    font-size: 1.6rem;
+  }
+
+  .lb-table thead th:nth-child(n+6),
+  .lb-table tbody td:nth-child(n+6) {
+    display: none;
+  }
+}
