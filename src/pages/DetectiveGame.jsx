@@ -12,6 +12,8 @@ import {
   updatePlayerSession,
   markPlayerInactive,
   getPlayerSession,
+  getActivePlayer,
+  resetPlayerGame,
 } from "../services/leaderboardService";
 import { loadApiKey, saveApiKey } from "../utils/storage";
 
@@ -147,8 +149,66 @@ const NameEntry = ({ onStart }) => {
   );
 };
 
+// ── Session History Panel ──────────────────────────────────────────────────────
+const SessionHistoryPanel = ({ history }) => {
+  const [open, setOpen] = useState(false);
+  if (!history || history.length === 0) return null;
+
+  const fmtDate = (iso) => {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleString("en-IN", {
+      day: "2-digit", month: "short",
+      hour: "2-digit", minute: "2-digit",
+    });
+  };
+
+  return (
+    <div style={{ background: "#111", border: "1px solid #222", borderRadius: "8px", padding: "14px" }}>
+      <button
+        onClick={() => setOpen((p) => !p)}
+        style={{
+          background: "none", border: "none", cursor: "pointer",
+          width: "100%", display: "flex", justifyContent: "space-between",
+          alignItems: "center", padding: 0,
+        }}
+      >
+        <span style={{ color: "#888", fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>
+          Past Sessions ({history.length})
+        </span>
+        <span style={{ color: "#555", fontSize: "12px" }}>{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          {history.map((s, i) => (
+            <div key={i} style={{
+              background: "#0d0d0d", border: "1px solid #1a1a1a",
+              borderRadius: "6px", padding: "10px",
+            }}>
+              <div style={{ color: "#555", fontFamily: "var(--font-mono)", fontSize: "10px", marginBottom: "6px" }}>
+                {fmtDate(s.startedAt)} → {fmtDate(s.endedAt)}
+              </div>
+              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                <span style={{ color: "var(--color-accent)", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: "bold" }}>
+                  {(s.score ?? 0).toLocaleString()} pts
+                </span>
+                <span style={{ color: "#aaa", fontFamily: "var(--font-mono)", fontSize: "11px" }}>
+                  {s.caseProgress ?? 0}%
+                </span>
+                <span style={{ color: "#666", fontFamily: "var(--font-mono)", fontSize: "11px" }}>
+                  {s.rank ?? "Rookie"}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Side Panel ─────────────────────────────────────────────────────────────────
-const InvestigationPanel = ({ score, caseProgress, hints, hintsUsed, onHint, isLoadingHint, isProcessing }) => {
+const InvestigationPanel = ({ score, caseProgress, hints, hintsUsed, onHint, isLoadingHint, isProcessing, sessionHistory }) => {
   const rank = getRank(caseProgress);
   const maxHints = 5;
 
@@ -285,6 +345,8 @@ const InvestigationPanel = ({ score, caseProgress, hints, hintsUsed, onHint, isL
         )}
       </div>
 
+      <SessionHistoryPanel history={sessionHistory} />
+
       <div style={{ color: "#444", fontSize: "10px", fontFamily: "var(--font-mono)", textAlign: "center", lineHeight: "1.5" }}>
         Type <span style={{ color: "#666" }}>"I accuse [Name]"</span><br />when ready to convict.
       </div>
@@ -313,6 +375,12 @@ const DetectiveGame = () => {
 
   // API key renewal
   const [showApiRenewal, setShowApiRenewal] = useState(false);
+
+  // Reset confirm modal
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Session history for sidebar
+  const [sessionHistory, setSessionHistory] = useState([]);
 
   // ── Refs to always have current values in async callbacks ──────────────────
   const scoreRef = useRef(0);
@@ -352,34 +420,54 @@ const DetectiveGame = () => {
     });
   };
 
-  // ── Start / Resume session ──────────────────────────────────────────────────
+  // ── Load a session object into all state + refs ────────────────────────────
+  const loadSession = (session, name) => {
+    const hasLog = session.log && session.log.length > 0;
+    const log = hasLog
+      ? session.log
+      : [{ type: "system", text: DETECTIVE_INTRO.replace("You are Detective Ethan Carter", `You are Detective ${name}`) }];
+
+    setLogSync(log);
+    setScoreSync(session.score ?? 0);
+    setCaseProgressSync(session.caseProgress ?? 0);
+    setHintsUsedSync(session.hintsUsed ?? 0);
+    setHintsSync(session.hints ?? []);
+    setTargetCharSync(session.targetCharacter ?? "");
+    setSessionHistory(session.sessionHistory ?? []);
+    setDetectiveName(name);
+
+    if (hasLog) {
+      // Append resume notice
+      const resumeMsg = {
+        type: "system",
+        text: `↩ Session resumed. Score: ${(session.score ?? 0).toLocaleString()} pts · Progress: ${session.caseProgress ?? 0}%`,
+      };
+      setLogSync((prev) => [...prev, resumeMsg]);
+    }
+  };
+
+  // ── Auto-resume: if an active session exists skip the name screen ──────────
+  useEffect(() => {
+    const active = getActivePlayer();
+    if (active) {
+      loadSession(active, active.name);
+      // Mark active again (tab refresh etc.)
+      registerOrResumePlayer(active.name, loadApiKey());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Start / Resume from name-entry screen ──────────────────────────────────
   const handleStart = (name) => {
     const session = registerOrResumePlayer(name, loadApiKey());
+    loadSession(session, name);
+  };
 
-    if (session.log && session.log.length > 0) {
-      // Resuming — restore everything
-      setLogSync(session.log);
-      setScoreSync(session.score ?? 0);
-      setCaseProgressSync(session.caseProgress ?? 0);
-      setHintsUsedSync(session.hintsUsed ?? 0);
-      setHintsSync(session.hints ?? []);
-      setTargetCharSync(session.targetCharacter ?? "");
-      setDetectiveName(name);
-
-      // Inject resume notice at the end of the log
-      const resumeMsg = { type: "system", text: `↩ Session resumed. Score: ${(session.score ?? 0).toLocaleString()} pts · Progress: ${session.caseProgress ?? 0}%` };
-      setLogSync((prev) => [...prev, resumeMsg]);
-    } else {
-      // New session
-      const introLog = [{ type: "system", text: DETECTIVE_INTRO.replace("You are Detective Ethan Carter", `You are Detective ${name}`) }];
-      setLogSync(introLog);
-      setScoreSync(0);
-      setCaseProgressSync(0);
-      setHintsUsedSync(0);
-      setHintsSync([]);
-      setTargetCharSync("");
-      setDetectiveName(name);
-    }
+  // ── Reset current game (archives to history, fresh start) ──────────────────
+  const handleReset = () => {
+    const fresh = resetPlayerGame(detectiveName);
+    if (fresh) loadSession(fresh, detectiveName);
+    setShowResetConfirm(false);
   };
 
   // ── Cleanup on unmount / navigation ────────────────────────────────────────
@@ -496,6 +584,36 @@ const DetectiveGame = () => {
         />
       )}
 
+      {/* Reset Confirm Modal */}
+      {showResetConfirm && (
+        <div className="oracle-modal-overlay">
+          <div className="oracle-modal-card" style={{ maxWidth: "400px" }}>
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>⚠️</div>
+            <h2 className="oracle-modal-title">Reset Game?</h2>
+            <p className="oracle-modal-body">
+              Your current progress — <strong style={{ color: "var(--color-accent)" }}>{score.toLocaleString()} pts, {caseProgress}%</strong> — will be archived to your session history.<br /><br />
+              A fresh investigation will begin from scratch.
+            </p>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                className="oracle-modal-btn"
+                style={{ background: "#ef4444", color: "#fff" }}
+                onClick={handleReset}
+              >
+                Reset &amp; Start Fresh
+              </button>
+              <button
+                className="oracle-modal-btn"
+                style={{ background: "#222" }}
+                onClick={() => setShowResetConfirm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="game-header" style={{ justifyContent: "space-between" }}>
         <div className="header-title">
           <h1>{detectiveName ? `Det. ${detectiveName}` : "Detective Mode"}</h1>
@@ -505,6 +623,16 @@ const DetectiveGame = () => {
             <span style={{ color: "var(--color-accent)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
               Score: {score.toLocaleString()} pts
             </span>
+          )}
+          {detectiveName && (
+            <button
+              className="header-btn"
+              onClick={() => setShowResetConfirm(true)}
+              title="Reset game — archives current session"
+              style={{ color: "#ef4444", borderColor: "rgba(239,68,68,0.3)" }}
+            >
+              <span>↺ Reset</span>
+            </button>
           )}
           <button className="header-btn" onClick={() => navigate("/leaderboard")} title="Leaderboard">
             <span>🏆 Board</span>
@@ -592,6 +720,7 @@ const DetectiveGame = () => {
             onHint={handleHint}
             isLoadingHint={isLoadingHint}
             isProcessing={isProcessing}
+            sessionHistory={sessionHistory}
           />
         )}      </div>
     </div>

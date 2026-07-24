@@ -83,6 +83,7 @@ export const registerOrResumePlayer = (name, apiKey = null) => {
     joinedAt: now(),
     lastSeen: now(),
     isActive: true,
+    sessionHistory: [], // archived past sessions
   };
 
   board[key] = entry;
@@ -179,7 +180,7 @@ export const deletePlayer = (playerKey) => {
 };
 
 /**
- * Resets a player's score to 0 (admin only).
+ * Resets a player's score to 0 (admin only — does NOT archive history).
  */
 export const resetPlayerScore = (playerKey) => {
   const board = getLeaderboard();
@@ -189,4 +190,50 @@ export const resetPlayerScore = (playerKey) => {
     board[playerKey].rank = "Rookie";
     saveLeaderboard(board);
   }
+};
+
+/**
+ * Resets a player's current game session to a fresh start,
+ * archiving the current session into sessionHistory first.
+ * The player stays on the leaderboard; their best-ever score is tracked.
+ */
+export const resetPlayerGame = (name) => {
+  const board = getLeaderboard();
+  const key = normalizeKey(name);
+  if (!board[key]) return;
+
+  const p = board[key];
+
+  // Archive current session snapshot
+  const archived = {
+    score: p.score,
+    caseProgress: p.caseProgress,
+    rank: p.rank,
+    hintsUsed: p.hintsUsed,
+    logLength: (p.log || []).length,
+    startedAt: p.joinedAt,
+    endedAt: now(),
+  };
+
+  const history = p.sessionHistory || [];
+  history.unshift(archived);          // newest first
+  if (history.length > 10) history.pop(); // cap at 10 past sessions
+
+  board[key] = {
+    ...p,
+    score: 0,
+    caseProgress: 0,
+    hintsUsed: 0,
+    rank: "Rookie",
+    log: [],
+    targetCharacter: "",
+    hints: [],
+    joinedAt: now(),
+    lastSeen: now(),
+    isActive: true,
+    sessionHistory: history,
+  };
+
+  saveLeaderboard(board);
+  return board[key];
 };
