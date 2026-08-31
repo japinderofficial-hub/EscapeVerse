@@ -14,6 +14,10 @@ const Home = () => {
     if (player) setReturningPlayer(player);
   }, []);
 
+  const handleStartGame = () => {
+    navigate("/game");
+  };
+
   return (
     <div className="home-container">
       <Atmosphere />
@@ -54,6 +58,14 @@ const Home = () => {
           <button
             className="start-button"
             style={{ backgroundColor: "#2a2a2a", color: "#00ffcc" }}
+            onClick={handleStartGame}
+          >
+            🧩 START ESCAPE ROOM
+          </button>
+
+          <button
+            className="start-button"
+            style={{ backgroundColor: "#1a1a1a", color: "var(--color-accent)", border: "1px solid rgba(229,195,126,0.3)" }}
             onClick={() => navigate("/detective")}
           >
             🔍 PLAY DETECTIVE MODE
